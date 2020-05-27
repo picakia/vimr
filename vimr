@@ -4,7 +4,7 @@
 # -p parameter lets you pass a pattern witch will be used to rename files in deper directories
 # You can also send -p "*" to rename all directories and subdirectories (using find here)
 # When you pass just filenames it will rename only passed files
-# USAGE: vimv [file1 file2] [-p pattern]
+# USAGE: vimr [file1 file2] [-p pattern]
 # https://github.com/picakia/vimr
 
 declare -r FILENAMES_FILE="$(mktemp --tmpdir vimv.XXX)"

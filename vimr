@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# Lists the current directory's files in Vim, so you can edit it and save to rename them
+# -p parameter lets you pass a pattern witch will be used to rename files in deper directories
+# You can also send -p "*" to rename all directories and subdirectories (using find here)
+# When you pass just filenames it will rename only passed files
+# USAGE: vimv [file1 file2] [-p pattern]
+# https://github.com/picakia/vimr
+
+declare -r FILENAMES_FILE="$(mktemp --tmpdir vimv.XXX)"
+
+trap '{ rm -f "${FILENAMES_FILE}" ; }' EXIT
+
+if [[ $1 == "-p" ]]; then
+    IFS=$'\r\n' GLOBIGNORE='*' command eval "src=(\$(find . -wholename ${2}))"
+elif [ $# -ne 0 ]; then
+    src=( "$@" )
+else
+    IFS=$'\r\n' GLOBIGNORE='*' command eval 'src=($(ls))'
+fi
+
+for ((i=0;i<${#src[@]};++i)); do
+    echo "${src[i]}" >> "${FILENAMES_FILE}"
+done
+
+${EDITOR:-vi} "${FILENAMES_FILE}"
+
+IFS=$'\r\n' GLOBIGNORE='*' command eval 'dest=($(cat "${FILENAMES_FILE}"))'
+
+renamed=0
+for ((i=0;i<${#src[@]};++i)); do
+    if [ "${src[i]}" != "${dest[i]}" ]; then
+        mkdir -p "`dirname "${dest[i]}"`"
+        if git ls-files --error-unmatch "${src[i]}" > /dev/null 2>&1; then
+            git mv "${src[i]}" "${dest[i]}"
+        else
+            mv "${src[i]}" "${dest[i]}"
+        fi
+        echo "renamed ${src[i]} -> ${dest[i]}"
+        ((renamed++))
+    fi
+done
+
+echo "$renamed" files renamed.

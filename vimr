@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -eu
+set -e
 
 # Lists the current directory's files in Vim, so you can edit it and save to rename them
 # -p parameter lets you pass a pattern witch will be used to rename files in deper directories
@@ -8,7 +8,7 @@ set -eu
 # USAGE: vimr [file1 file2] [-p pattern]
 # https://github.com/picakia/vimr
 
-declare -r FILENAMES_FILE=$(mktemp "${TMPDIR:-/tmp}/vimv.XXX")
+declare -r FILENAMES_FILE=$(mktemp "${TMPDIR:-/tmp}/vimr.XXX")
 
 trap '{ rm -f "${FILENAMES_FILE}" ; }' EXIT
 

@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -eu
 
 # Lists the current directory's files in Vim, so you can edit it and save to rename them
 # -p parameter lets you pass a pattern witch will be used to rename files in deper directories
@@ -7,7 +8,7 @@
 # USAGE: vimr [file1 file2] [-p pattern]
 # https://github.com/picakia/vimr
 
-declare -r FILENAMES_FILE="$(mktemp --tmpdir vimv.XXX)"
+declare -r FILENAMES_FILE=$(mktemp "${TMPDIR:-/tmp}/vimv.XXX")
 
 trap '{ rm -f "${FILENAMES_FILE}" ; }' EXIT
 
@@ -28,9 +29,15 @@ ${EDITOR:-vi} "${FILENAMES_FILE}"
 IFS=$'\r\n' GLOBIGNORE='*' command eval 'dest=($(cat "${FILENAMES_FILE}"))'
 
 renamed=0
+
+if (( ${#src[@]} != ${#dest[@]} )); then
+    echo "WARN: Number of files changed. Did you delete a line by accident? Aborting.." >&2
+    exit 1
+fi
+
 for ((i=0;i<${#src[@]};++i)); do
     if [ "${src[i]}" != "${dest[i]}" ]; then
-        mkdir -p "`dirname "${dest[i]}"`"
+        mkdir -p "$(dirname "${dest[i]}")"
         if git ls-files --error-unmatch "${src[i]}" > /dev/null 2>&1; then
             git mv "${src[i]}" "${dest[i]}"
         else

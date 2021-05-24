@@ -4,10 +4,14 @@ vimr is a terminal-based file rename utility that lets you easily mass-rename fi
 
 ## Installing
 
-```
-curl https://raw.githubusercontent.com/picakia/vimr/master/vimr > ~/bin/vimr && chmod +755 ~/bin/vimr
-```
-
+1. For the current user:
+   ```
+   curl https://raw.githubusercontent.com/picakia/vimr/master/vimr > ~/bin/vimr && chmod +755 ~/bin/vimr
+   ```
+2. For the current system:
+   ```
+   sudo PREFIX=/usr/local make install
+   ```
 Or simply copy the `vimr` file to a location in your `$PATH` and make it executable.
 
 ## Usage
